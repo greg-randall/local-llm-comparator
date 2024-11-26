@@ -102,13 +102,13 @@ class ModelComparisonEvaluator:
         return {
             **{model: OllamaClient() for model in [
                 "gemma2:2b",
-                #"gemma2:9b-instruct-q4_0",
+                "gemma2:9b-instruct-q4_0",
                 "granite3-dense:8b-instruct-q4_0",
                 "llama3.1:8b-instruct-q4_0",
                 "llama3.2:latest",
-                #"marco-o1:latest",
-                #"mistral:7b-instruct",
-                #"qwen2.5:14b-instruct-q2_K",
+                "marco-o1:latest",
+                "mistral:7b-instruct",
+                "qwen2.5:14b-instruct-q2_K",
             ]}
         }
 
@@ -312,17 +312,17 @@ class ModelComparisonEvaluator:
         Print and save final comprehensive rankings.
         """
         print("\n--- Final Model Rankings ---")
-        for rank, (model, win_percentage) in enumerate(self.rankings.items(), 1):
-            print(f"{rank}. {model}: {win_percentage:.2f}% win rate")
+        for rank, (model, advanced_score) in enumerate(self.rankings.items(), 1):
+            print(f"{rank}. {model}: {advanced_score:.4f} advanced score")
         
         filename = f"model_rankings_{int(time.time())}.csv"
         
         with open(filename, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(['Rank', 'Model', 'Win Percentage'])
+            csvwriter.writerow(['Rank', 'Model', 'Advanced Score'])
             
-            for rank, (model, win_percentage) in enumerate(self.rankings.items(), 1):
-                csvwriter.writerow([rank, model, f"{win_percentage:.2f}%"])
+            for rank, (model, advanced_score) in enumerate(self.rankings.items(), 1):
+                csvwriter.writerow([rank, model, f"{advanced_score:.4f}"])
         
         print(f"\nRankings saved to {filename}")
 
