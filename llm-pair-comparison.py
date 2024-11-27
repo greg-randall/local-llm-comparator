@@ -1,19 +1,17 @@
-import os
 import csv
-import re
-import time
 import itertools
+import math
+import os
+import re
+import requests
+import shutil
 import textwrap
 import threading
-from typing import Dict, List, Tuple, Optional
+import time
 from datetime import datetime
-import math
-import requests
+from typing import Dict, List, Optional, Tuple
 
 import ollama
-from openai import OpenAI
-from termcolor import cprint
-import shutil
 
 
 class ModelClient:
@@ -49,29 +47,8 @@ class OllamaClient(ModelClient):
             response = ollama.chat(model=model, messages=[{'role': 'user', 'content': prompt}])
             return response['message']['content'].strip()
         except Exception as e:
-            cprint(f"Ollama API Error: {e}", "magenta")
+            print(f"Ollama API Error: {e}")
             return ""
-
-
-class OpenAIClient(ModelClient):
-    """Client for OpenAI models."""
-    def call(self, prompt: str, model: str) -> str:
-        """
-        Generate a response using OpenAI's API.
-        
-        Args:
-            prompt (str): Input prompt
-            model (str): OpenAI model identifier
-        
-        Returns:
-            str: Model's response
-        """
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-        chat_completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model=model
-        )
-        return chat_completion.choices[0].message.content
 
 
 class ModelComparisonEvaluator:
@@ -172,7 +149,7 @@ class ModelComparisonEvaluator:
             response2 = self._clean_response(self.models[model2].call(prompt, model2))
             return [(model1, model2, response1, response2)]
         except Exception as e:
-            cprint(f"Error generating responses for {model1} and {model2}: {e}", "red")
+            print(f"Error generating responses for {model1} and {model2}: {e}")
             return []
 
     @staticmethod
@@ -197,7 +174,7 @@ class ModelComparisonEvaluator:
             prompt (str): Input prompt for model comparison
             num_rounds (int, optional): Number of comparison rounds. Defaults to 1.
         """
-        print("Welcome to Comprehensive Model Comparison!")
+        print("Welcome to Local LLM Comparator!")
         print("You'll be shown responses from two models side by side.")
         print("Type 'A' for the left model, 'B' for the right model, or 'S' to skip.\n")
         
