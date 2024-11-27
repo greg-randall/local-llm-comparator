@@ -8,13 +8,13 @@ import threading
 from typing import Dict, List, Tuple, Optional
 from datetime import datetime
 import math
+import requests
 
 import ollama
 from openai import OpenAI
 from termcolor import cprint
 import shutil
 
-from html_helper import *
 
 class ModelClient:
     """Abstract base class for model API clients."""
@@ -330,29 +330,24 @@ class ModelComparisonEvaluator:
 
 def main():
 
-    #url = "https://careers.ua.edu/jobs/law-distinguished-professor-of-the-practice-of-law-525090-tuscaloosa-alabama-united-states"
-    url = "https://careers.ua.edu/jobs/medical-billing-coder-525150-tuscaloosa-alabama-united-states"
-    file_path = 'health_job.html'
-    html_content = download_html(url, file_path)
-    page_content = get_page_body_text(html_content)
-
-    llm_lingua, tokenizer, encoding = initialize_compressor()
-    compressed_content = compress_prompt(page_content, llm_lingua, tokenizer, encoding, 0.75)
+    url = "https://r.jina.ai/https://careers.ua.edu/jobs/medical-billing-coder-525150-tuscaloosa-alabama-united-states"
+    response = requests.get(url)
+    page_content = response.text
 
     # You would pass in your specific prompt here
     prompt = f"""From the below JOB LISTING extract JOB TITLE, JOB SUMMARY, and JOB REQUIREMENTS, follow this format EXACTLY:
 Job Title: [Single Line, No Formatting]
 
-Job Summary: [3-5 sentences describing role responsibilities, direct and factual]
+Job Summary: [Write EXACTLY 3-5 sentences describing role responsibilities, direct and factual]
 
-Job Requirements: [3-5 sentences covering qualifications, skills, and educational needs]
+Job Requirements: [Write EXACTLY 3-5 sentences covering qualifications, skills, and educational needs]
 
 
-DO NOT EXPLAIN WHAT YOU ARE DOING, reply with EXACLTY the three requested sections!!! DO NOT use markdown, html, xml, or any other formatting!
+DO NOT EXPLAIN WHAT YOU ARE DOING, reply with EXACLTY the three requested sections!!! DO NOT use markdown, html, xml, or any other formatting! 
 
 
 JOB LISTING:
-{compressed_content}"""
+{page_content}"""
     
     evaluator = ModelComparisonEvaluator()
     evaluator.run_comprehensive_comparisons(prompt, num_rounds=1)  # Increased rounds for more comprehensive comparison
